@@ -62,6 +62,14 @@ app.post('/api/persons', (req, res) => {
             'error': 'content missing'
         })
     }
+    const existingPerson = persons.find(person => person.name === body.name)
+
+    if(existingPerson){
+        return res.status(400).json({
+            error: 'name and number are required'
+        })
+    }
+
     const person = {
         id: Math.random() * 1000,
         name: body.name,

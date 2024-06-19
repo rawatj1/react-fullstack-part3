@@ -1,7 +1,10 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 
 app.use(express.json())
+app.use(morgan('tiny'))
+
 let persons =  [
     {
         "id": 1,
@@ -30,7 +33,6 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (req, res) => {
-    console.log("logs")
     res.json(persons)
 })
 

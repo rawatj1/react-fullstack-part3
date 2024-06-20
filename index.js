@@ -9,9 +9,16 @@ const bodyToken = morgan.token('body', (req, res) => {
     return '';
 })
 
-app.use(express.json())
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+const conditionalMorgan = (req, res, next) => {
+    if (req.method === 'POST') {
+        morgan(':method :url :status :res[content-length] - :response-time ms :body')(req, res, next)
+    } else {
+        next()
+    }
+}
+app.use(express.json())
+app.use(conditionalMorgan)
 let persons =  [
     {
         "id": 1,

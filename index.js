@@ -1,7 +1,21 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
+const cors = require('cors')
+const dotnev = require('dotenv')
 
+const conditionalMorgan = (req, res, next) => {
+    if (req.method === 'POST') {
+        morgan(':method :url :status :res[content-length] - :response-time ms :body')(req, res, next)
+    } else {
+        next()
+    }
+}
 app.use(express.json())
+app.use(conditionalMorgan)
+app.use(cors())
+dotnev.config()
+
 let persons =  [
     {
         "id": 1,
@@ -30,11 +44,56 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (req, res) => {
-    console.log("logs")
     res.json(persons)
 })
 
-const PORT = 3001
+app.get('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const person = persons.find(person => person.id === id)
+    if(person){
+        res.json(person)
+    } else {
+        res.status(404).end()
+    }
+})
+
+app.get('/info', (req, res) => {
+    const response = 'Phonebook has info for ' + persons.length + ' people <br/> ' + new Date()
+    res.send(response)
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    persons = persons.filter(person => person.id !== id)
+    res.status(204).end()
+})
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+    if(!body.name){
+        return res.status(404).json({
+            'error': 'content missing'
+        })
+    }
+    const existingPerson = persons.find(person => person.name === body.name)
+
+    if(existingPerson){
+        return res.status(400).json({
+            error: 'name and number are required'
+        })
+    }
+
+    const person = {
+        id: Math.random() * 1000,
+        name: body.name,
+        number: body.number
+    }
+
+    persons = persons.concat(person)
+    res.json(persons)
+})
+
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

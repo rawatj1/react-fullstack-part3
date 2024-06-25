@@ -1,14 +1,8 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
-
-const bodyToken = morgan.token('body', (req, res) => {
-    if(req.method === 'POST'){
-        return JSON.stringify(req.body)
-    }
-    return '';
-})
-
+const cors = require('cors')
+const dotnev = require('dotenv')
 
 const conditionalMorgan = (req, res, next) => {
     if (req.method === 'POST') {
@@ -19,6 +13,9 @@ const conditionalMorgan = (req, res, next) => {
 }
 app.use(express.json())
 app.use(conditionalMorgan)
+app.use(cors())
+dotnev.config()
+
 let persons =  [
     {
         "id": 1,
@@ -96,7 +93,7 @@ app.post('/api/persons', (req, res) => {
     res.json(persons)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

@@ -11,6 +11,7 @@ const conditionalMorgan = (req, res, next) => {
         next()
     }
 }
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(conditionalMorgan)
 app.use(cors())
@@ -39,9 +40,14 @@ let persons =  [
     }
 ]
 
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
+// Serve the React app for the /home route
+app.get('/home', (req, res) => {
+    res.sendFile(__dirname + '/dist/index.html')
 })
+
+/*app.get('/', (request, response) => {
+    response.send('<h1>Hello World!</h1>')
+})*/
 
 app.get('/api/persons', (req, res) => {
     res.json(persons)

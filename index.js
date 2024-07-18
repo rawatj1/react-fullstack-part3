@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const dotnev = require('dotenv')
 
+morgan.token('body', (req) => JSON.stringify(req.body))
 const conditionalMorgan = (req, res, next) => {
     if (req.method === 'POST') {
         morgan(':method :url :status :res[content-length] - :response-time ms :body')(req, res, next)
@@ -50,7 +51,7 @@ app.get('/home', (req, res) => {
 })*/
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+   res.json(persons)
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -76,6 +77,7 @@ app.delete('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
     const body = req.body
+    console.log("body", body)
     if(!body.name){
         return res.status(404).json({
             'error': 'content missing'
